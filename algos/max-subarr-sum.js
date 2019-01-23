@@ -18,7 +18,7 @@ function areaSum(startIdx, endIdx, sum) {
 function findAreaSum(array, startIdx, endIdx) {
 	let sum = 0;
 	if (startIdx == endIdx) {
-		let newAreaSum = new areaSum(startIdx, endIdx, array[startIdx]);
+		return new areaSum(startIdx, endIdx, array[startIdx]);
 	}
 	for (let idx = startIdx; idx <= endIdx; idx++) {
 		sum += array[idx];
