@@ -1,4 +1,13 @@
-var myArray = [3, 9, -12, 6, -2, 10, 5];
+/*var myArray = [3, 9, -12, 6, -2, 10, 5];*/
+
+var myArray = [];
+for (let i = 0; i < 800; i++) {
+	let isNegative = (Math.random() > .5);
+	let curVal = Math.random()*10;
+	
+	if (isNegative) curVal *= -1;
+	myArray.push(curVal);
+}
 
 function areaSum(startIdx, endIdx, sum) {
 	this.startIdx = startIdx;
@@ -36,6 +45,8 @@ function midAreaRightSum(array, startIdx, endIdx) {
 	return greatestSum;
 }
 
+console.time("test");
+
 let currentMaxAreaSum = null;
 let arraySize = 2;
 
@@ -72,12 +83,30 @@ while ((arraySize/2) < myArray.length) {
 		if (midLeftEndIdx >= myArray.length) midLeftEndIdx = myArray.length-1;
 		if (midRightStartIdx >= myArray.length) midRightStartIdx = myArray.length-1;
 
-		console.log("allVars:", arraySize, startIdx, endIdx, halfArraySize, midLeftEndIdx, midRightStartIdx);
-		console.log("allSums:", leftAreaSum, rightAreaSum, _midAreaLeftSum, _midAreaRightSum, midAreaSum);
-		console.log("curMax:", currentMaxAreaSum);
+		//console.log("allVars:", arraySize, startIdx, endIdx, halfArraySize, midLeftEndIdx, midRightStartIdx);
+		//console.log("allSums:", leftAreaSum, rightAreaSum, _midAreaLeftSum, _midAreaRightSum, midAreaSum);
+		//console.log("curMax:", currentMaxAreaSum);
 	}
 
 	arraySize = 2*arraySize;
 }
 
 console.log("Final Max:", currentMaxAreaSum);
+
+console.timeEnd("test");
+
+/* Brute - Force verify */
+
+console.time("test2");
+
+currentMaxAreaSum = null;
+for (let i = 0; i < myArray.length; i++) {
+	for (let j = 0; j < myArray.length; j++) {
+		let curSum = findAreaSum(myArray, i, j);
+		if ((currentMaxAreaSum == null) || (curSum.sum >= currentMaxAreaSum.sum)) currentMaxAreaSum = curSum;
+	}
+}
+
+console.log("Final Max #2:", currentMaxAreaSum);
+
+console.timeEnd("test2");
