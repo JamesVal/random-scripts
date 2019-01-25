@@ -30,8 +30,13 @@ mergeSort.prototype.sortSublists = function(listA, listB) {
 	return sortedList;
 }
 
-var myList = [6,5,3,2,1,4,8,7];
-for (let i = 0; i < 800; i++) myList.push(Math.random()*1000);
+var myList = [];
+var myList2 = [];
+for (let i = 0; i < 16; i++) {
+	let curVal = Math.random()*1000;
+	myList.push(curVal);
+	myList2.push(curVal);
+}
 
 console.time("algo");
 var sortedList = [];
@@ -58,3 +63,21 @@ while (subArraySize/2 < (myList.length)) {
 	curIdx = 0;
 }
 console.timeEnd("algo");
+
+
+/* Brute Force Check */
+let curHighest = myList2[0];
+
+console.time("norm");
+
+for (let i = 0; i < myList2.length; i++) {
+	for (let j = 0; j < myList2.length; j++) {
+		if (myList2[i] > myList2[j]) {
+			let temp = myList2[j];
+			myList2[j] = myList2[i]
+			myList2[i] = temp;
+		}
+	}
+}
+
+console.timeEnd("norm");

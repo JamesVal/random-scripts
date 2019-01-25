@@ -38,32 +38,6 @@ function matrixMultiply(mA, mB) {
 	return resultMatrix; 
 }
 
-function rowColAdd(currentMatrix, rowIdx, colIdx, rowStartIdx, colStartIdx, matrixSize) {
-	let result = 0;
-	for (let idx = 0; idx < matrixSize; idx++) {
-		result += currentMatrix[rowIdx][colStartIdx+idx];
-	}
-	for (let idx = 0; idx < matrixSize; idx++) {
-		result += currentMatrix[rowIdx][colStartIdx+idx];
-	}
-	return result;
-}
-
-function matrixAddition(currentMatrix, resultMatrix, rowStartIdx, colStartIdx, matrixSize) {
-	for (let rowIdx = rowStartIdx; rowIdx < (rowStartIdx + matrixSize); rowIdx++) {
-		for (let colIdx = colStartIdx; colIdx < (colStartIdx + matrixSize); colIdx++) {
-			resultMatrix[rowIdx][colIdx] = rowColAdd(currentMatrix, rowIdx, colIdx, rowStartIdx, colStartIdx, matrixSize);
-		}
-	}	
-	/*
-	for (let rowIdx = startIdx; rowIdx < endIdx; rowIdx++) {
-		for (let colIdx = startIdx; colIdx < endIdx; colIdx++) {
-			resultMatrix[rowIdx][colIdx] = rowColAdd(currentMatrix, rowIdx, colIdx, startIdx, endIdx);
-		}
-	}
-	*/
-}
-
 var matrixA = [];
 var matrixB = [];
 
