@@ -24,20 +24,15 @@ function rowColMultiply(mA, mB, rowIdx, colIdx) {
 	return result;
 }
 
-function matrixMultiply(mA, mB) {
-	let resultMatrix = [];
-
-	for (let rowIdx = 0; rowIdx < mA.length; rowIdx++) {
+function matrixMultiply(resultMatrix, mA, mB, aIdxStart, bIdxStart, matrixSize) {
+	for (let rowIdx = aIdxStart; rowIdx < aIdxStart+matrixSize; rowIdx++) {
 		let curRow = [];
 		for (let colIdx = 0; colIdx < mA.length; colIdx++) {
 			 curRow.push(rowColMultiply(mA, mB, rowIdx, colIdx));
 		}
 		resultMatrix.push(curRow);
 	}
-
-	return resultMatrix; 
 }
-
 var matrixA = [];
 var matrixB = [];
 
