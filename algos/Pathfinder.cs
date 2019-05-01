@@ -17,6 +17,7 @@ public class Node
 {
   public List<Node> possiblePaths = new List<Node>();
   public Vector2 m_origin;
+  public int distanceFromOrigin;
 
   float boxCollisionSize = 1f;
   bool isObstacle = false;
@@ -42,6 +43,11 @@ public class Node
     isObstacle = state;
   }
 
+  public bool getObstacle()
+  {
+    return isObstacle;
+  }
+
   public void printPaths()
   {
     Console.WriteLine("Origin: " + m_origin.m_x + "," + m_origin.m_y);
@@ -58,6 +64,8 @@ public class Node
 public class PathFinder
 {
   public List<Node> allNodes = new List<Node>();
+  public List<Node> traversedNodes = new List<Node>();
+  public int pathLength = 0;
   Node startNode;
   Node endNode;
 
@@ -70,6 +78,7 @@ public class PathFinder
         Node newNode = new Node(x, y);
         /* Simulate walls */
         if ((x == 1 && y == 1) || (x == 2 && y == 1)) newNode.setObstacle(true);
+        if ((x == 0 && y == 1)) newNode.setObstacle(true);
         allNodes.Add(newNode);
       }
     }
@@ -108,24 +117,42 @@ public class PathFinder
     }
   }
 
-  public void traversePath(Node currentNode, int pathLength)
+  public bool traversePath(List<Node> previousNodes, List<Node> currentNodes, int curDistance)
   {
-    if ((currentNode.m_origin.m_x == endNode.m_origin.m_x) && (currentNode.m_origin.m_y == endNode.m_origin.m_y))
+    List<Node> nextNodes = new List<Node>();
+
+    for (int eachNodeIdx = 0; eachNodeIdx < currentNodes.Count; eachNodeIdx++)
     {
-      return pathLength;
-    }
-    else
-    {
-      for (int eachNodeIdx = 0; eachNodeIdx < currentNode.possiblePaths.Count; eachNodeIdx++)
+      Node curNode = currentNodes[eachNodeIdx];
+      curNode.distanceFromOrigin = curDistance;
+
+      if ((curNode.m_origin.m_x == endNode.m_origin.m_x) && (curNode.m_origin.m_y == endNode.m_origin.m_y))
       {
-        Node curNode = currentNode.possiblePaths[eachNodeIdx];
-        if ((curNode.m_origin.m_x == endNode.m_origin.m_x) && (curNode.m_origin.m_y == endNode.m_origin.m_y))
+        Console.WriteLine("FOUND END " + curNode.distanceFromOrigin.ToString());
+        //Console.WriteLine("FOUND END");
+        return true;
+      }
+
+      for (int eachInnerNodeIdx = 0; eachInnerNodeIdx < curNode.possiblePaths.Count; eachInnerNodeIdx++)
+      {
+        Node innerNode = curNode.possiblePaths[eachInnerNodeIdx];
+        if (!(previousNodes.Contains(innerNode) || currentNodes.Contains(innerNode)) && !innerNode.getObstacle())
         {
-          Console.WriteLine("FOUND END");
-          break;
+          nextNodes.Add(innerNode);
         }
       }
     }
+
+    if (nextNodes.Count > 0) return traversePath(currentNodes, nextNodes, curDistance+1);
+
+    Console.WriteLine("NO PATH");
+
+    return false;
+  }
+
+  public void buildPath(List<Node> pathToBuild)
+  {
+    pathToBuild.Add(allNodes[0]);
   }
 }
 
@@ -134,9 +161,12 @@ public class Program
   public static void Main()
   {
     PathFinder pathFinder = new PathFinder();
+    List<Node> myPath = new List<Node>();
     pathFinder.generateGrid(4,4);
     pathFinder.connectNodes();
-    pathFinder.traversePath(pathFinder.allNodes[pathFinder.allNodes.Count-5]);
+    pathFinder.traversePath(new List<Node>(), new List<Node>{ pathFinder.allNodes[0] }, 0);
+    pathFinder.buildPath(myPath);
+    Console.WriteLine(myPath.Count);
 
     Console.WriteLine("Hello World");
   }
