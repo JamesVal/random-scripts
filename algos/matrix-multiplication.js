@@ -25,14 +25,15 @@ function rowColMultiply(mA, mB, rowIdx, colIdx) {
 }
 
 function matrixMultiply(resultMatrix, mA, mB, aIdxStart, bIdxStart, matrixSize) {
-	for (let rowIdx = aIdxStart; rowIdx < aIdxStart+matrixSize; rowIdx++) {
+	for (let rowIdx = aIdxStart; rowIdx < (aIdxStart+matrixSize); rowIdx++) {
 		let curRow = [];
-		for (let colIdx = 0; colIdx < mA.length; colIdx++) {
+		for (let colIdx = bIdxStart; colIdx < (bIdxStart+matrixSize); colIdx++) {
 			 curRow.push(rowColMultiply(mA, mB, rowIdx, colIdx));
 		}
 		resultMatrix.push(curRow);
 	}
 }
+
 var matrixA = [];
 var matrixB = [];
 
