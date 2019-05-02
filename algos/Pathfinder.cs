@@ -17,7 +17,7 @@ public class Node
 {
   public List<Node> possiblePaths = new List<Node>();
   public Vector2 m_origin;
-  public int distanceFromOrigin;
+  public int levelFromStart;
 
   float boxCollisionSize = 1f;
   bool isObstacle = false;
@@ -66,8 +66,8 @@ public class PathFinder
   public List<Node> allNodes = new List<Node>();
   public List<Node> traversedNodes = new List<Node>();
   public int pathLength = 0;
-  Node startNode;
-  Node endNode;
+  public Node startNode;
+  public Node endNode;
 
   public void generateGrid(int rows, int cols)
   {
@@ -82,10 +82,6 @@ public class PathFinder
         allNodes.Add(newNode);
       }
     }
-
-    // JJV DEBUG - pick a couple of spots
-    startNode = allNodes[0];
-    endNode = allNodes[allNodes.Count-1];
   }
 
   public void connectNodes()
@@ -117,6 +113,23 @@ public class PathFinder
     }
   }
 
+  public void setStartEnd(Vector2 startPosition, Vector2 endPosition)
+  {
+    for (int eachNodeIdx = 0; eachNodeIdx < allNodes.Count; eachNodeIdx++)
+    {
+      Node curNode = allNodes[eachNodeIdx];
+
+      if ((curNode.m_origin.m_x == startPosition.m_x) && (curNode.m_origin.m_y == startPosition.m_y))
+      {
+        startNode = curNode;
+      }
+      if ((curNode.m_origin.m_x == endPosition.m_x) && (curNode.m_origin.m_y == endPosition.m_y))
+      {
+        endNode = curNode;
+      }
+    }
+  }
+
   public bool traversePath(List<Node> previousNodes, List<Node> currentNodes, int curDistance)
   {
     List<Node> nextNodes = new List<Node>();
@@ -124,11 +137,11 @@ public class PathFinder
     for (int eachNodeIdx = 0; eachNodeIdx < currentNodes.Count; eachNodeIdx++)
     {
       Node curNode = currentNodes[eachNodeIdx];
-      curNode.distanceFromOrigin = curDistance;
+      curNode.levelFromStart = curDistance;
 
       if ((curNode.m_origin.m_x == endNode.m_origin.m_x) && (curNode.m_origin.m_y == endNode.m_origin.m_y))
       {
-        Console.WriteLine("FOUND END " + curNode.distanceFromOrigin.ToString());
+        Console.WriteLine("FOUND END " + curNode.levelFromStart.ToString());
         //Console.WriteLine("FOUND END");
         return true;
       }
@@ -150,9 +163,53 @@ public class PathFinder
     return false;
   }
 
-  public void buildPath(List<Node> pathToBuild)
+  double calcDistance(Node startNode, Node endNode)
   {
-    pathToBuild.Add(allNodes[0]);
+    return Math.Sqrt(Math.Pow(Math.Abs(startNode.m_origin.m_x-endNode.m_origin.m_x), 2) + Math.Pow(Math.Abs(startNode.m_origin.m_y-endNode.m_origin.m_y), 2));
+  }
+
+  public void buildPath(List<Node> pathToBuild, Node currentNode)
+  {
+    pathToBuild.Insert(0, currentNode);
+    List<Node> nextNodes = new List<Node>();
+    Node nodeToAdd;
+    double curDistance;
+
+    for (int eachNodeIdx = 0; eachNodeIdx < currentNode.possiblePaths.Count; eachNodeIdx++)
+    {
+      Node nextNode = currentNode.possiblePaths[eachNodeIdx];
+      if ((nextNode.levelFromStart == (currentNode.levelFromStart-1)) && !pathToBuild.Contains(nextNode))
+        nextNodes.Add(nextNode);
+    }
+
+    if (nextNodes.Count > 0)
+    {
+      curDistance = calcDistance(currentNode, nextNodes[0]);
+      nodeToAdd = nextNodes[0];
+
+      for (int eachNodeIdx = 1; eachNodeIdx < nextNodes.Count; eachNodeIdx++)
+      {
+        Node nextNode = nextNodes[eachNodeIdx];
+        double nextDistance = calcDistance(currentNode, nextNode);
+        if (nextDistance < curDistance)
+        {
+          curDistance = nextDistance;
+          nodeToAdd = nextNode;
+        }
+      }
+
+      buildPath(pathToBuild, nodeToAdd);
+    }
+  }
+
+  public void printPath(List<Node> pathToPrint)
+  {
+    Console.WriteLine("Current Path:");
+    for (int eachNodeIdx = 0; eachNodeIdx < pathToPrint.Count; eachNodeIdx++)
+    {
+      Node curNode = pathToPrint[eachNodeIdx];
+      Console.Write("("+curNode.m_origin.m_x+","+curNode.m_origin.m_y+")");
+    }
   }
 }
 
@@ -164,9 +221,10 @@ public class Program
     List<Node> myPath = new List<Node>();
     pathFinder.generateGrid(4,4);
     pathFinder.connectNodes();
-    pathFinder.traversePath(new List<Node>(), new List<Node>{ pathFinder.allNodes[0] }, 0);
-    pathFinder.buildPath(myPath);
-    Console.WriteLine(myPath.Count);
+    pathFinder.setStartEnd(new Vector2(0,0), new Vector2(3,3));
+    pathFinder.traversePath(new List<Node>(), new List<Node>{ pathFinder.startNode }, 0);
+    pathFinder.buildPath(myPath, pathFinder.endNode);
+    pathFinder.printPath(myPath);
 
     Console.WriteLine("Hello World");
   }
