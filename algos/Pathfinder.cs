@@ -17,7 +17,7 @@ public class Node
 {
   public List<Node> possiblePaths = new List<Node>();
   public Vector2 m_origin;
-  public int levelFromStart;
+  public int levelFromStart = -99;
 
   float boxCollisionSize = 1f;
   bool isObstacle = false;
@@ -130,14 +130,19 @@ public class PathFinder
     }
   }
 
-  public bool traversePath(List<Node> previousNodes, List<Node> currentNodes, int curDistance)
+  public bool traversePath(List<Node> currentNodes, int curDistance)
   {
     List<Node> nextNodes = new List<Node>();
 
     for (int eachNodeIdx = 0; eachNodeIdx < currentNodes.Count; eachNodeIdx++)
     {
       Node curNode = currentNodes[eachNodeIdx];
+
+      if (curNode.levelFromStart != -99) continue;
+
       curNode.levelFromStart = curDistance;
+
+      Console.WriteLine("Set_Level " + curNode.levelFromStart + " (" + curNode.m_origin.m_x + "," + curNode.m_origin.m_y + ")");
 
       if ((curNode.m_origin.m_x == endNode.m_origin.m_x) && (curNode.m_origin.m_y == endNode.m_origin.m_y))
       {
@@ -149,14 +154,14 @@ public class PathFinder
       for (int eachInnerNodeIdx = 0; eachInnerNodeIdx < curNode.possiblePaths.Count; eachInnerNodeIdx++)
       {
         Node innerNode = curNode.possiblePaths[eachInnerNodeIdx];
-        if (!(previousNodes.Contains(innerNode) || currentNodes.Contains(innerNode)) && !innerNode.getObstacle())
-        {
+        
+        //if (!(previousNodes.Contains(innerNode) || currentNodes.Contains(innerNode)) && !innerNode.getObstacle())
+        if (!nextNodes.Contains(innerNode) && (innerNode.levelFromStart < 0) && !innerNode.getObstacle())
           nextNodes.Add(innerNode);
-        }
       }
     }
 
-    if (nextNodes.Count > 0) return traversePath(currentNodes, nextNodes, curDistance+1);
+    if (nextNodes.Count > 0) return traversePath(nextNodes, curDistance+1);
 
     Console.WriteLine("NO PATH");
 
@@ -222,10 +227,10 @@ public class Program
     pathFinder.generateGrid(4,4);
     pathFinder.connectNodes();
     pathFinder.setStartEnd(new Vector2(0,0), new Vector2(3,3));
-    pathFinder.traversePath(new List<Node>(), new List<Node>{ pathFinder.startNode }, 0);
+    pathFinder.traversePath(new List<Node>{ pathFinder.startNode }, 0);
     pathFinder.buildPath(myPath, pathFinder.endNode);
+    Console.WriteLine("(" + pathFinder.endNode.m_origin.m_x + "," + pathFinder.endNode.m_origin.m_y + ") - " + pathFinder.endNode.levelFromStart);
+    Console.WriteLine(myPath.Count);
     pathFinder.printPath(myPath);
-
-    Console.WriteLine("Hello World");
   }
 }
