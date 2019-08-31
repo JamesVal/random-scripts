@@ -4,6 +4,7 @@
  **/
 
 var allVals = [];
+var resultEmote = [":)", ":("];
 
 function getDigitSquareSum(val) {
   let myStr = val.toString();
@@ -25,8 +26,18 @@ function getDigitSquareSum(val) {
 function determineHappy(val) {
   let previousResults = [];
   let curVal = val;
+  let result = 0;
 
-  
+  while (result == 0) {
+    curVal = getDigitSquareSum(curVal);
+
+    if (curVal == 1) result = 1;
+    else if (previousResults.indexOf(curVal) != -1) result = 2;
+
+    previousResults.push(curVal);
+  }
+
+  return result;
 }
 
 const N = parseInt(readline());
@@ -35,7 +46,12 @@ for (let i = 0; i < N; i++) {
     allVals.push(x);
 }
 
+for (let i = 0; i < N; i++) {
+  let result = determineHappy(allVals[i]);
+  console.log(allVals[i] + " " + resultEmote[result-1]);
+}
+
 // Write an action using console.log()
 // To debug: console.error('Debug messages...');
 
-console.log('23 :)');
+/*console.log('23 :)');*/
